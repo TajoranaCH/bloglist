@@ -57,6 +57,50 @@ test('a valid blog can be added ', async () => {
 
   assert(titles.includes('Type wars'))
 })
+
+test('likes default to zero if missing', async () => {
+  const newBlog = {
+    title: 'Type wars',
+    author: 'Robert C. Martin',
+    url: 'http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html',
+  }
+
+  await api
+    .post('/api/blog')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const response = await api.get('/api/blog')
+  const addedBlog = response.body.find(b => b.title === 'Type wars')
+
+  assert.strictEqual(addedBlog.likes, 0)
+})
+
+test('if title missing status 400', async () => {
+  const newBlog = {
+    author: 'Robert C. Martin',
+    url: 'http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html',
+  }
+
+  await api
+    .post('/api/blog')
+    .send(newBlog)
+    .expect(400)
+})
+
+test('if title missing status 400', async () => {
+  const newBlog = {
+    title: 'asd asd',
+    author: 'Robert C. Martin',
+  }
+
+  await api
+    .post('/api/blog')
+    .send(newBlog)
+    .expect(400)
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
