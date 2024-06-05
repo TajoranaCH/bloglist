@@ -4,8 +4,9 @@
   "description": "Fullstackopen excercise",
   "main": "index.js",
   "scripts": {
-    "test": "node --test",
-    "dev": "nodemon index.js",
+    "start": "cross-env NODE_ENV=production node index.js",
+    "test": "cross-env NODE_ENV=test node --test",
+    "dev": "cross-env NODE_ENV=development nodemon index.js",
     "lint": "eslint ."
   },
   "author": "",
@@ -17,8 +18,11 @@
   },
   "dependencies": {
     "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "mongoose": "^8.4.1"
+    "mongoose": "^8.4.1",
+    "save-dev": "^0.0.1-security",
+    "supertest": "^7.0.0"
   }
 }
