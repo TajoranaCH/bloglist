@@ -3,14 +3,6 @@ const Blog = require('../models/blog')
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
 
-const getTokenFrom = request => {
-  const authorization = request.get('authorization')
-  if (authorization && authorization.startsWith('Bearer ')) {
-    return authorization.replace('Bearer ', '')
-  }
-  return null
-}
-
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
   return response.json(blogs)
@@ -30,7 +22,8 @@ blogsRouter.put('/:id', async (request, response) => {
 
 blogsRouter.post('/', async (request, response) => {
   if (!request.body.title || !request.body.url) return response.status(400).end()
-  const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
+
+  const decodedToken = jwt.verify(request.token, process.env.SECRET)
 
   if (!decodedToken.id) {
     return response.status(401).json({ error: 'token invalid' })
@@ -49,8 +42,18 @@ blogsRouter.post('/', async (request, response) => {
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
-  await Blog.findByIdAndDelete(request.params.id)
-  response.status(204).end()
+  const decodedToken = jwt.verify(request.token, process.env.SECRET)
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: 'token invalid' })
+  }
+  const blog = await Blog.findById(request.params.id)
+  if (!blog) return response.status(404).end()
+
+  if (!blog.user || blog.user.toString() === decodedToken.id ) {
+    await Blog.findByIdAndDelete(request.params.id)
+    return response.status(204).end()
+  }
+  response.status(401).json({ error: 'not permitted to user' })
 })
 
 module.exports = blogsRouter

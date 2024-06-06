@@ -45,10 +45,11 @@ describe('blog addition tests', () => {
       url: 'http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html',
       likes: 2,
     }
-
+    const randomToken = await helper.getFirstUserToken()
     await api
       .post('/api/blog')
       .send(newBlog)
+      .set({ Authorization: `Bearer ${randomToken}` })
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
@@ -68,9 +69,12 @@ describe('blog addition tests', () => {
       url: 'http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html',
     }
 
+    const randomToken = await helper.getFirstUserToken()
+
     await api
       .post('/api/blog')
       .send(newBlog)
+      .set({ Authorization: `Bearer ${randomToken}` })
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
@@ -97,10 +101,12 @@ describe('blog addition tests', () => {
       title: 'asd asd',
       author: 'Robert C. Martin',
     }
+    const token = await helper.getFirstUserToken()
 
     await api
       .post('/api/blog')
       .send(newBlog)
+      .set({ 'Authorization': `Bearer ${token}` })
       .expect(400)
   })
 })
@@ -109,9 +115,11 @@ describe('deletion of a blog', () => {
   test('succeeds with status code 204 if id is valid', async () => {
     const blogsAtStart = await helper.blogsInDb()
     const blogToDelete = blogsAtStart[0]
+    const token = await helper.getFirstUserToken()
 
     await api
       .delete(`/api/blog/${blogToDelete.id}`)
+      .set({ 'Authorization': `Bearer ${token}` })
       .expect(204)
 
     const blogsAtEnd = await helper.blogsInDb()

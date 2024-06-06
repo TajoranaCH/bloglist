@@ -1,5 +1,6 @@
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const getTokenFromUser = require('../utils/token')
 const initialBlogs = [
   {
     title: 'React patterns',
@@ -44,6 +45,11 @@ const usersInDb = async () => {
   return users.map(user => user.toJSON())
 }
 
+const getFirstUserToken = async () => {
+  const users = await User.find({})
+  return getTokenFromUser(users[0])
+}
+
 module.exports = {
-  initialBlogs, nonExistingId, blogsInDb, usersInDb
+  initialBlogs, nonExistingId, blogsInDb, usersInDb, getFirstUserToken
 }
