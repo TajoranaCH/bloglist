@@ -9,7 +9,7 @@ const blogs = require('./controllers/blogs')
 const users = require('./controllers/users')
 const login = require('./controllers/login')
 const middleware = require('./utils/middleware')
-
+const testingRouter = require('./controllers/testing')
 logger.info('connecting to', config.MONGODB_URI)
 mongoose.set('strictQuery', false)
 
@@ -28,6 +28,9 @@ app.use(middleware.tokenExtractor)
 app.use('/api/blogs', blogs)
 app.use('/api/users', users)
 app.use('/api/login', login)
+if (process.env.NODE_ENV === 'test') {
+  app.use('/api/testing', testingRouter)
+}
 app.use(express.static('dist'))
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)
