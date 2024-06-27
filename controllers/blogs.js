@@ -29,7 +29,6 @@ blogsRouter.post('/', async (request, response) => {
     return response.status(401).json({ error: 'token invalid' })
   }
   const blogCreator = await User.findById(decodedToken.id)
-
   if (!request.body.likes) request.body.likes = 0
 
   const blog = new Blog({ ...request.body, user: blogCreator._id })
@@ -43,6 +42,7 @@ blogsRouter.post('/', async (request, response) => {
 
 blogsRouter.delete('/:id', async (request, response) => {
   const decodedToken = jwt.verify(request.token, process.env.SECRET)
+
   if (!decodedToken.id) {
     return response.status(401).json({ error: 'token invalid' })
   }
@@ -50,7 +50,8 @@ blogsRouter.delete('/:id', async (request, response) => {
   if (!blog) return response.status(404).end()
 
   if (!blog.user || blog.user.toString() === decodedToken.id ) {
-    await Blog.findByIdAndDelete(request.params.id)
+    const res = await Blog.findByIdAndDelete(request.params.id)
+    console.log(res)
     return response.status(204).end()
   }
   response.status(401).json({ error: 'not permitted to user' })
